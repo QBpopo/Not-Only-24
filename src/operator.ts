@@ -1,19 +1,43 @@
-
-import type { Tuple } from "./utils.ts";
+import type { Tuple } from "./types.ts";
 
 export interface Operator<N extends number> {
 	readonly symbol: symbol;
 	readonly arity: N;
-	readonly mapping: (...a: Tuple<number, N>) => number;
-	readonly isInDomain: (...a: Tuple<number, N>) => boolean;
-	readonly format: (...a: Tuple<string, N>) => string;
+	readonly mapping: (...a: Tuple<N, number>) => number;
+	readonly isInDomain: (...a: Tuple<N, number>) => boolean;
+	readonly format: (...a: Tuple<N, string>) => string;
 }
+
+export const numToOpr
+	= (num: number, sym = Symbol(num), format = () => `${num}`): Operator<0> => ({
+		symbol: sym,
+		arity: 0,
+		mapping: () => num,
+		isInDomain: () => true,
+		format,
+	});
+
+export const pi: Operator<0> = {
+	symbol: Symbol("pi"),
+	arity: 0,
+	mapping: () => Math.PI,
+	isInDomain: () => true,
+	format: () => "π",
+};
+
+export const e: Operator<0> = {
+	symbol: Symbol("e"),
+	arity: 0,
+	mapping: () => Math.E,
+	isInDomain: () => true,
+	format: () => "e",
+};
 
 export const identity: Operator<1> = {
 	symbol: Symbol("identity"),
 	arity: 1,
 	mapping: a => a,
-	isInDomain: a => true,
+	isInDomain: _ => true,
 	format: a => a,
 };
 
@@ -21,7 +45,7 @@ export const add: Operator<2> = {
 	symbol: Symbol("add"),
 	arity: 2,
 	mapping: (a, b) => a + b,
-	isInDomain: (a, b) => true,
+	isInDomain: _ => true,
 	format: (a, b) => `${a}+${b}`,
 };
 
@@ -29,7 +53,7 @@ export const sub: Operator<2> = {
 	symbol: Symbol("sub"),
 	arity: 2,
 	mapping: (a, b) => a - b,
-	isInDomain: (a, b) => true,
+	isInDomain: _ => true,
 	format: (a, b) => `${a}-${b}`,
 };
 
@@ -37,7 +61,7 @@ export const mul: Operator<2> = {
 	symbol: Symbol("mul"),
 	arity: 2,
 	mapping: (a, b) => a * b,
-	isInDomain: (a, b) => true,
+	isInDomain: _ => true,
 	format: (a, b) => `${a}*${b}`,
 };
 
@@ -45,7 +69,7 @@ export const div: Operator<2> = {
 	symbol: Symbol("div"),
 	arity: 2,
 	mapping: (a, b) => a / b,
-	isInDomain: (a, b) => b !== 0,
+	isInDomain: (_, b) => b !== 0,
 	format: (a, b) => `${a}/${b}`,
 };
 
@@ -53,7 +77,7 @@ export const mod: Operator<2> = {
 	symbol: Symbol("mod"),
 	arity: 2,
 	mapping: (a, b) => a % b,
-	isInDomain: (a, b) => b !== 0,
+	isInDomain: (_a, b) => b !== 0,
 	format: (a, b) => `${a} mod ${b}`,
 };
 
@@ -77,7 +101,7 @@ export const exp: Operator<1> = {
 	symbol: Symbol("exp"),
 	arity: 1,
 	mapping: a => Math.exp(a),
-	isInDomain: a => true,
+	isInDomain: _ => true,
 	format: a => `e^${a}`,
 };
 
