@@ -19,7 +19,7 @@ function* _solve(
 	}
 	for (const opr of oprs) {
 		if (nums.length < opr.arity) continue;
-		for (const indice of utils.getAllPermutations(Array.from({ length: nums.length }, (_, i) => i), opr.arity)) {
+		for (const indice of utils.permuteUnique(Array.from({ length: nums.length }, (_, i) => i), opr.arity)) {
 			const x = indice.map(i => nums[i]!);
 			if (!opr.isInDomain(...x)) continue;
 			yield* _solve(

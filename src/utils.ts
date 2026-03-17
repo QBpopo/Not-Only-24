@@ -1,21 +1,23 @@
 import type { PrefixExpr } from "./types.ts";
 
-export const getAllPermutations = <T>(arr: T[], n: number): T[][] => {
-	if (n === 0) return [[]];
-	if (n > arr.length) throw new Error();
-	arr.sort();
-	const result: T[][] = [];
-	for (let i = 0; i < arr.length; i++) {
-		if (i > 0 && arr[i] === arr[i - 1]) continue;
-		const rest = [...arr.slice(0, i), ...arr.slice(i + 1)];
-		const restPerms = getAllPermutations(rest, n - 1);
-		for (const perm of restPerms) {
-			result.push([arr[i]!, ...perm]);
+export function* permuteUnique<T>(arr: T[], n: number): Generator<T[]> {
+	if (n < 0 || n > arr.length) throw new Error("Invalid n");
+	const sorted = [...arr].sort();
+	const used = Array.from({ length: sorted.length }, () => false);
+	const path: T[] = [];
+	yield* (function* backtrack(): Generator<T[]> {
+		if (path.length === n) return yield [...path];
+		for (let i = 0; i < sorted.length; i++) {
+			if (used[i]) continue;
+			if (i > 0 && sorted[i] === sorted[i - 1] && !used[i - 1]) continue;
+			used[i] = true;
+			path.push(sorted[i]!);
+			yield* backtrack();
+			path.pop();
+			used[i] = false;
 		}
-	}
-	return result;
-};
-
+	})();
+}
 export const prefixExprToStr = (expr: PrefixExpr): string => {
 	const stack: string[] = [];
 	for (let i = expr.length - 1; i >= 0; i--) {
